@@ -24,8 +24,8 @@ This version also keeps a local history of digests, creates an experiment accoun
 
 ```bash
 cp .env.example .env
-npm install
-npm run run
+pnpm install
+pnpm run run
 ```
 
 ## Extra commands
@@ -33,19 +33,19 @@ npm run run
 Review unfinished experiments:
 
 ```bash
-npm run review
+pnpm run review
 ```
 
 Log the outcome of the latest experiment:
 
 ```bash
-npm run log-action -- --exercise yes --post no --workflow yes --rating 4 --notes "Used it for one real repo setup. Worth keeping."
+pnpm run log-action -- --exercise yes --post no --workflow yes --rating 4 --notes "Used it for one real repo setup. Worth keeping."
 ```
 
 Log the outcome for a specific run:
 
 ```bash
-npm run log-action -- --run 2026-04-10T15-30-00-000Z --exercise yes --post yes --workflow no --rating 3
+pnpm run log-action -- --run 2026-04-10T15-30-00-000Z --exercise yes --post yes --workflow no --rating 3
 ```
 
 ## Data files

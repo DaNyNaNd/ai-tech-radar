@@ -1,8 +1,8 @@
-import { getConfig } from '../config.js';
+import { getStorageConfig } from '../config.js';
 import { HistoryStore } from '../history/store.js';
 
 async function main(): Promise<void> {
-  const config = getConfig();
+  const config = getStorageConfig();
   const history = new HistoryStore(config.DIGEST_HISTORY_DIR, config.EXPERIMENT_LOG_FILE);
   const pending = await history.getPendingEntries();
 

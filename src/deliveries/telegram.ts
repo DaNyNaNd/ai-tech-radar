@@ -16,10 +16,7 @@ export async function sendTelegramDigest(args: {
   const lines: string[] = [];
   lines.push(`<b>AI Tech Radar</b>`);
   lines.push(escapeHtml(args.digest.generatedAt));
-<<<<<<< Updated upstream
-=======
   lines.push(`Run: <code>${escapeHtml(args.digest.runId)}</code>`);
->>>>>>> Stashed changes
   lines.push('');
 
   args.digest.topSignals.forEach((signal, index) => {
@@ -33,14 +30,11 @@ export async function sendTelegramDigest(args: {
   lines.push(escapeHtml(args.digest.tryThisWeek.why));
   lines.push(`<b>Workflow fit:</b> ${escapeHtml(args.digest.tryThisWeek.workflowFit)}`);
   lines.push(escapeHtml(args.digest.tryThisWeek.suggestedExperiment));
-<<<<<<< Updated upstream
-=======
   lines.push(`<b>Success criteria:</b>`);
   args.digest.tryThisWeek.successCriteria.forEach((criterion, index) => {
     lines.push(`${index + 1}. ${escapeHtml(criterion)}`);
   });
   lines.push(`<b>Guardrail:</b> ${escapeHtml(args.digest.tryThisWeek.guardrail)}`);
->>>>>>> Stashed changes
   lines.push('');
   lines.push(`<b>Trend:</b> ${escapeHtml(args.digest.trendObservation)}`);
 

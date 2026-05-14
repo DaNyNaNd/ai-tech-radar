@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 const EnvSchema = z.object({
-  OPENAI_API_KEY: z.string().min(1),
+  OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default('gpt-5.4-mini'),
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_CHAT_ID: z.string().optional(),
@@ -21,14 +21,36 @@ const EnvSchema = z.object({
 });
 
 export type AppConfig = z.infer<typeof EnvSchema> & {
+  OPENAI_API_KEY: string;
   rssFeeds: string[];
 };
 
+export type StorageConfig = Pick<z.infer<typeof EnvSchema>, 'DIGEST_HISTORY_DIR' | 'EXPERIMENT_LOG_FILE'>;
+
+function parseEnv(): z.infer<typeof EnvSchema> {
+  return EnvSchema.parse(process.env);
+}
+
+export function getStorageConfig(): StorageConfig {
+  const parsed = parseEnv();
+
+  return {
+    DIGEST_HISTORY_DIR: parsed.DIGEST_HISTORY_DIR,
+    EXPERIMENT_LOG_FILE: parsed.EXPERIMENT_LOG_FILE
+  };
+}
+
 export function getConfig(): AppConfig {
-  const parsed = EnvSchema.parse(process.env);
+  const parsed = parseEnv();
+  const apiKey = parsed.OPENAI_API_KEY?.trim();
+
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY is required to run the radar.');
+  }
 
   return {
     ...parsed,
+    OPENAI_API_KEY: apiKey,
     rssFeeds: parsed.RSS_FEEDS.split(',').map((feed) => feed.trim()).filter(Boolean)
   };
 }
