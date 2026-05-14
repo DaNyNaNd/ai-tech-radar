@@ -19,10 +19,40 @@ test('storage config does not require an OpenAI API key', () => {
 
 test('main app config requires an OpenAI API key', () => {
   const previous = { ...process.env };
+  process.env.LLM_PROVIDER = 'openai';
   delete process.env.OPENAI_API_KEY;
+  delete process.env.GROQ_API_KEY;
 
   try {
     assert.throws(() => getConfig(), /OPENAI_API_KEY is required/);
+  } finally {
+    process.env = previous;
+  }
+});
+
+test('main app config accepts Groq without an OpenAI API key', () => {
+  const previous = { ...process.env };
+  process.env.LLM_PROVIDER = 'groq';
+  process.env.GROQ_API_KEY = 'groq-test-key';
+  delete process.env.OPENAI_API_KEY;
+
+  try {
+    const config = getConfig();
+    assert.equal(config.LLM_PROVIDER, 'groq');
+    assert.equal(config.GROQ_API_KEY, 'groq-test-key');
+  } finally {
+    process.env = previous;
+  }
+});
+
+test('main app config requires a Groq API key when Groq is selected', () => {
+  const previous = { ...process.env };
+  process.env.LLM_PROVIDER = 'groq';
+  delete process.env.GROQ_API_KEY;
+  delete process.env.OPENAI_API_KEY;
+
+  try {
+    assert.throws(() => getConfig(), /GROQ_API_KEY is required/);
   } finally {
     process.env = previous;
   }

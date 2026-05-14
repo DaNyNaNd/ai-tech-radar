@@ -1,8 +1,11 @@
 import { z } from 'zod';
 
 const EnvSchema = z.object({
+  LLM_PROVIDER: z.enum(['openai', 'groq']).default('openai'),
   OPENAI_API_KEY: z.string().optional(),
   OPENAI_MODEL: z.string().default('gpt-5.4-mini'),
+  GROQ_API_KEY: z.string().optional(),
+  GROQ_MODEL: z.string().default('openai/gpt-oss-20b'),
   TELEGRAM_BOT_TOKEN: z.string().optional(),
   TELEGRAM_CHAT_ID: z.string().optional(),
   GITHUB_TOKEN: z.string().optional(),
@@ -21,7 +24,6 @@ const EnvSchema = z.object({
 });
 
 export type AppConfig = z.infer<typeof EnvSchema> & {
-  OPENAI_API_KEY: string;
   rssFeeds: string[];
 };
 
@@ -42,15 +44,21 @@ export function getStorageConfig(): StorageConfig {
 
 export function getConfig(): AppConfig {
   const parsed = parseEnv();
-  const apiKey = parsed.OPENAI_API_KEY?.trim();
+  const openAiApiKey = parsed.OPENAI_API_KEY?.trim();
+  const groqApiKey = parsed.GROQ_API_KEY?.trim();
 
-  if (!apiKey) {
+  if (parsed.LLM_PROVIDER === 'openai' && !openAiApiKey) {
     throw new Error('OPENAI_API_KEY is required to run the radar.');
+  }
+
+  if (parsed.LLM_PROVIDER === 'groq' && !groqApiKey) {
+    throw new Error('GROQ_API_KEY is required to run the radar.');
   }
 
   return {
     ...parsed,
-    OPENAI_API_KEY: apiKey,
+    OPENAI_API_KEY: openAiApiKey,
+    GROQ_API_KEY: groqApiKey,
     rssFeeds: parsed.RSS_FEEDS.split(',').map((feed) => feed.trim()).filter(Boolean)
   };
 }

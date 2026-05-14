@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "packageManager": "pnpm@11.0.9",
-  "description": "Daily software engineering and AI tooling radar with OpenAI summarization and Telegram delivery.",
+  "description": "Daily software engineering and AI tooling radar with OpenAI or Groq summarization and Telegram delivery.",
   "engines": {
     "node": ">=20"
   },

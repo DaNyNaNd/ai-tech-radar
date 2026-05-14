@@ -5,6 +5,7 @@ import { HistoryStore } from './history/store.js';
 import { GitHubSource } from './sources/github.js';
 import { HackerNewsSource } from './sources/hackernews.js';
 import { RssSource } from './sources/rss.js';
+import { createDigestProvider } from './llm/provider.js';
 import { DigestSummarizer } from './summarizer.js';
 import { StateStore } from './utils/state.js';
 
@@ -23,7 +24,7 @@ async function main(): Promise<void> {
   const items = collected.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
   const freshItems = await state.filterNewItems(items);
 
-  const summarizer = new DigestSummarizer(config.OPENAI_API_KEY, config.OPENAI_MODEL);
+  const summarizer = new DigestSummarizer(createDigestProvider(config));
   const digest = await summarizer.summarize(freshItems);
   await history.saveDigest(digest);
 

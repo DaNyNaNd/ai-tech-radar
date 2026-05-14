@@ -1,6 +1,6 @@
 # AI Tech Radar
 
-A small Node.js + TypeScript service that pulls in software engineering and AI tooling signals, filters duplicate noise, ranks the useful items, and emits a compact digest with one forced experiment.
+A small Node.js + TypeScript service that pulls in software engineering and AI tooling signals, filters duplicate noise, ranks the useful items with OpenAI or Groq, and emits a compact digest with one forced experiment.
 
 This version also keeps a local history of digests, creates an experiment accountability log, and includes a playbook so this does not degrade into a fancy reading habit.
 
@@ -10,7 +10,7 @@ This version also keeps a local history of digests, creates an experiment accoun
 - Pulls from GitHub repository search
 - Pulls from selected RSS feeds
 - Deduplicates items using a local state file
-- Uses OpenAI to produce a structured digest
+- Uses OpenAI or Groq to produce a structured digest
 - Saves each digest to `data/history`
 - Creates and updates an experiment follow-up ledger in `data/experiment-log.json`
 - Outputs to console or Telegram
@@ -18,7 +18,7 @@ This version also keeps a local history of digests, creates an experiment accoun
 ## Quick start
 
 1. Copy `.env.example` to `.env`
-2. Fill in at least `OPENAI_API_KEY`
+2. Fill in the API key for your selected provider
 3. Install dependencies
 4. Run the radar
 
@@ -26,6 +26,26 @@ This version also keeps a local history of digests, creates an experiment accoun
 cp .env.example .env
 pnpm install
 pnpm run run
+```
+
+## LLM provider
+
+The default `.env.example` uses Groq so you can test the flow with a Groq API key:
+
+```env
+LLM_PROVIDER=groq
+GROQ_API_KEY=your_groq_api_key
+GROQ_MODEL=openai/gpt-oss-20b
+```
+
+`openai/gpt-oss-20b` is the default Groq model because the app requests strict JSON Schema output for the digest.
+
+To use OpenAI instead:
+
+```env
+LLM_PROVIDER=openai
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_MODEL=gpt-5.4-mini
 ```
 
 ## Extra commands
@@ -81,7 +101,7 @@ RSS_FEEDS=https://openai.com/news/rss.xml,https://www.pragmaticengineer.com/rss/
 Run every morning at 7:30:
 
 ```cron
-30 7 * * * cd /path/to/ai-tech-radar && /usr/bin/node --env-file=.env --import tsx src/index.ts >> ./radar.log 2>&1
+30 7 * * * cd /path/to/ai-tech-radar && /usr/bin/node --env-file-if-exists=.env --import tsx src/index.ts >> ./radar.log 2>&1
 ```
 
 ## Guardrails
