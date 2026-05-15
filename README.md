@@ -71,8 +71,10 @@ pnpm run log-action -- --run 2026-04-10T15-30-00-000Z --exercise yes --post yes 
 ## Data files
 
 - `data/state.json`: dedupe state
-- `data/history/*.json`: one file per digest run
+- `data/history/*.json`: one file per completed digest run, including notification delivery status
 - `data/experiment-log.json`: your accountability ledger
+
+A run is considered complete after summarization succeeds and the digest is written to history. Telegram is a notification channel only; if Telegram delivery fails, the digest is still saved and the failure is recorded in that history file.
 
 ## Telegram setup
 

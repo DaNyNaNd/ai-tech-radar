@@ -7,7 +7,43 @@ import { HackerNewsSource } from './sources/hackernews.js';
 import { RssSource } from './sources/rss.js';
 import { createDigestProvider } from './llm/provider.js';
 import { DigestSummarizer } from './summarizer.js';
+import type { AppConfig } from './config.js';
+import type { DeliveryRecord, RadarDigest } from './types.js';
 import { StateStore } from './utils/state.js';
+
+async function deliverDigest(config: AppConfig, digest: RadarDigest): Promise<DeliveryRecord> {
+  const attemptedAt = new Date().toISOString();
+
+  if (config.OUTPUT_MODE === 'telegram') {
+    if (!config.TELEGRAM_BOT_TOKEN || !config.TELEGRAM_CHAT_ID) {
+      return {
+        mode: 'telegram',
+        status: 'failed',
+        attemptedAt,
+        error: 'TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are required for telegram output.'
+      };
+    }
+
+    try {
+      await sendTelegramDigest({
+        botToken: config.TELEGRAM_BOT_TOKEN,
+        chatId: config.TELEGRAM_CHAT_ID,
+        digest
+      });
+      return { mode: 'telegram', status: 'succeeded', attemptedAt };
+    } catch (error) {
+      return {
+        mode: 'telegram',
+        status: 'failed',
+        attemptedAt,
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+
+  printDigest(digest);
+  return { mode: 'console', status: 'succeeded', attemptedAt };
+}
 
 async function main(): Promise<void> {
   const config = getConfig();
@@ -26,22 +62,13 @@ async function main(): Promise<void> {
 
   const summarizer = new DigestSummarizer(createDigestProvider(config));
   const digest = await summarizer.summarize(freshItems);
+  digest.delivery = await deliverDigest(config, digest);
   await history.saveDigest(digest);
+  await state.markSeen(items);
 
-  if (config.OUTPUT_MODE === 'telegram') {
-    if (!config.TELEGRAM_BOT_TOKEN || !config.TELEGRAM_CHAT_ID) {
-      throw new Error('TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are required for telegram output.');
-    }
-
-    await sendTelegramDigest({
-      botToken: config.TELEGRAM_BOT_TOKEN,
-      chatId: config.TELEGRAM_CHAT_ID,
-      digest
-    });
-    return;
+  if (digest.delivery.status === 'failed') {
+    console.warn(`Delivery failed: ${digest.delivery.error}`);
   }
-
-  printDigest(digest);
 }
 
 main().catch((error) => {

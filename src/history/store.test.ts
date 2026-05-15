@@ -59,3 +59,22 @@ test('updating an experiment preserves immutable run metadata', async () => {
   assert.equal(updated.didExercise, true);
   assert.equal(updated.resultRating, 4);
 });
+
+test('saved digest history includes delivery status', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'radar-history-'));
+  const history = new HistoryStore(path.join(root, 'history'), path.join(root, 'experiment-log.json'));
+  const deliveredDigest: RadarDigest = {
+    ...digest('run-3'),
+    delivery: {
+      mode: 'telegram',
+      status: 'failed',
+      attemptedAt: '2026-05-13T12:01:00.000Z',
+      error: 'Telegram delivery failed: 500 unavailable'
+    }
+  };
+
+  await history.saveDigest(deliveredDigest);
+
+  const digests = await history.listDigests();
+  assert.deepEqual(digests[0]?.delivery, deliveredDigest.delivery);
+});

@@ -25,11 +25,12 @@ export class StateStore {
   async filterNewItems<T extends { id: string }>(items: T[]): Promise<T[]> {
     const state = await this.load();
     const seen = new Set(state.seenIds);
-    const fresh = items.filter((item) => !seen.has(item.id));
+    return items.filter((item) => !seen.has(item.id));
+  }
 
+  async markSeen<T extends { id: string }>(items: T[]): Promise<void> {
+    const state = await this.load();
     const nextSeenIds = [...new Set([...items.map((item) => item.id), ...state.seenIds])].slice(0, 1000);
     await this.save({ seenIds: nextSeenIds });
-
-    return fresh;
   }
 }
