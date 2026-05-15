@@ -3,21 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Daily software engineering and AI tooling radar with OpenAI summarization and Telegram delivery.",
+  "packageManager": "pnpm@11.0.9",
+  "description": "Daily software engineering and AI tooling radar with OpenAI or Groq summarization and Telegram delivery.",
   "engines": {
     "node": ">=20"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
-    "run": "node --env-file=.env --import tsx src/index.ts",
+    "run": "node --env-file-if-exists=.env --import tsx src/index.ts",
     "check": "tsc --noEmit",
-<<<<<<< Updated upstream
-    "format": "prettier --write ."
-=======
+    "test": "node --import tsx --test \"src/**/*.test.ts\"",
     "format": "prettier --write .",
-    "review": "node --env-file=.env --import tsx src/cli/review.ts",
-    "log-action": "node --env-file=.env --import tsx src/cli/log-action.ts"
->>>>>>> Stashed changes
+    "review": "node --env-file-if-exists=.env --import tsx src/cli/review.ts",
+    "log-action": "node --env-file-if-exists=.env --import tsx src/cli/log-action.ts"
   },
   "dependencies": {
     "openai": "^6.4.0",
@@ -25,16 +23,9 @@
     "zod": "^4.1.5"
   },
   "devDependencies": {
-<<<<<<< Updated upstream
     "@types/node": "^25.6.0",
     "prettier": "^3.8.2",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
-=======
-    "@types/node": "^24.3.0",
-    "prettier": "^3.6.2",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
->>>>>>> Stashed changes
   }
 }

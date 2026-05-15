@@ -30,6 +30,22 @@ export interface RadarDigest {
   };
   trendObservation: string;
   discardPile: string[];
+  sources?: SourceCollectionRecord[];
+  delivery?: DeliveryRecord;
+}
+
+export interface SourceCollectionRecord {
+  name: SourceName;
+  status: 'succeeded' | 'failed';
+  itemCount: number;
+  error?: string;
+}
+
+export interface DeliveryRecord {
+  mode: 'console' | 'telegram';
+  status: 'succeeded' | 'failed';
+  attemptedAt: string;
+  error?: string;
 }
 
 export interface SourceCollector {

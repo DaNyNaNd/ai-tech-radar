@@ -1,41 +1,59 @@
-import type { LLMProvider } from "./types.js";
+import type { DigestJsonProvider, GenerateJsonArgs } from './types.js';
 
-export class GroqProvider implements LLMProvider {
+export class GroqDigestProvider implements DigestJsonProvider {
   constructor(
     private readonly apiKey: string,
-    private readonly model: string,
+    private readonly model: string
   ) {}
 
-  async summarize(input: string): Promise<string> {
-    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
+  async generateJson(args: GenerateJsonArgs): Promise<string> {
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: this.model,
         messages: [
           {
-            role: "system",
-            content:
-              "Return valid JSON only. Do not wrap the response in markdown code fences.",
+            role: 'system',
+            content: args.systemPrompt
           },
           {
-            role: "user",
-            content: input,
-          },
+            role: 'user',
+            content: args.userPrompt
+          }
         ],
-      }),
+        response_format: {
+          type: 'json_schema',
+          json_schema: {
+            name: args.schemaName,
+            strict: true,
+            schema: args.schema
+          }
+        }
+      })
     });
 
-    if (!res.ok) {
-      throw new Error(
-        `Groq API request failed: ${res.status} ${res.statusText}`,
-      );
+    if (!response.ok) {
+      const body = await response.text();
+      throw new Error(`Groq API request failed: ${response.status} ${body}`);
     }
 
-    const json = await res.json();
-    return json.choices?.[0]?.message?.content ?? "";
+    const json = await response.json() as {
+      choices?: Array<{
+        message?: {
+          content?: string;
+        };
+      }>;
+    };
+    const content = json.choices?.[0]?.message?.content;
+
+    if (!content) {
+      throw new Error('Groq API response did not include message content.');
+    }
+
+    return content;
   }
 }

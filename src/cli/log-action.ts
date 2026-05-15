@@ -1,4 +1,4 @@
-import { getConfig } from '../config.js';
+import { getStorageConfig } from '../config.js';
 import { HistoryStore } from '../history/store.js';
 
 function parseArgs(argv: string[]): Record<string, string> {
@@ -32,7 +32,7 @@ function parseBool(value: string | undefined): boolean | null | undefined {
 
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
-  const config = getConfig();
+  const config = getStorageConfig();
   const history = new HistoryStore(config.DIGEST_HISTORY_DIR, config.EXPERIMENT_LOG_FILE);
 
   const digests = await history.listDigests();
