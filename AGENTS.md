@@ -32,7 +32,7 @@ git diff --check
 ## Data Files
 
 - `data/state.json` is local dedupe state and may not exist until the app runs.
-- `data/history/*.json` is generated digest history and may not exist until the app runs. Each completed run should include delivery status.
+- `data/history/*.json` is generated digest history and may not exist until the app runs. Each completed run should include source collection and delivery status.
 - `data/experiment-log.json` is the local experiment ledger.
 
 Avoid committing generated digest history unless the user explicitly asks for example fixtures.
@@ -41,6 +41,7 @@ Avoid committing generated digest history unless the user explicitly asks for ex
 
 - Keep the accountability loop intact: every saved digest should create a corresponding experiment-log entry.
 - Only mark source items seen after summarization and history persistence succeed.
+- Fail the run when every source collector fails; continue and record warnings when only some sources fail.
 - Telegram delivery failures should be recorded in digest history, not treated as failed runs.
 - Keep the prompt action-oriented. The suggested experiment should be a 30-90 minute workflow experiment, not reading.
 - If adding another provider or summary caching, add tests and update `.env.example`, `README.md`, and this file in the same change.

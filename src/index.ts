@@ -6,6 +6,7 @@ import { GitHubSource } from './sources/github.js';
 import { HackerNewsSource } from './sources/hackernews.js';
 import { RssSource } from './sources/rss.js';
 import { createDigestProvider } from './llm/provider.js';
+import { collectSourceItems } from './run.js';
 import { DigestSummarizer } from './summarizer.js';
 import type { AppConfig } from './config.js';
 import type { DeliveryRecord, RadarDigest } from './types.js';
@@ -56,15 +57,19 @@ async function main(): Promise<void> {
     new RssSource(config.rssFeeds, config.MAX_ITEMS_PER_SOURCE)
   ];
 
-  const collected = await Promise.allSettled(sources.map((source) => source.collect()));
-  const items = collected.flatMap((result) => (result.status === 'fulfilled' ? result.value : []));
+  const { items, sources: sourceResults } = await collectSourceItems(sources);
   const freshItems = await state.filterNewItems(items);
 
   const summarizer = new DigestSummarizer(createDigestProvider(config));
   const digest = await summarizer.summarize(freshItems);
+  digest.sources = sourceResults;
   digest.delivery = await deliverDigest(config, digest);
   await history.saveDigest(digest);
   await state.markSeen(items);
+
+  sourceResults
+    .filter((source) => source.status === 'failed')
+    .forEach((source) => console.warn(`Source ${source.name} failed: ${source.error}`));
 
   if (digest.delivery.status === 'failed') {
     console.warn(`Delivery failed: ${digest.delivery.error}`);

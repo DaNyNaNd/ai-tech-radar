@@ -78,3 +78,29 @@ test('saved digest history includes delivery status', async () => {
   const digests = await history.listDigests();
   assert.deepEqual(digests[0]?.delivery, deliveredDigest.delivery);
 });
+
+test('saved digest history includes source collection status', async () => {
+  const root = await mkdtemp(path.join(tmpdir(), 'radar-history-'));
+  const history = new HistoryStore(path.join(root, 'history'), path.join(root, 'experiment-log.json'));
+  const digestWithSources: RadarDigest = {
+    ...digest('run-4'),
+    sources: [
+      {
+        name: 'hackernews',
+        status: 'succeeded',
+        itemCount: 15
+      },
+      {
+        name: 'github',
+        status: 'failed',
+        itemCount: 0,
+        error: 'fetch failed'
+      }
+    ]
+  };
+
+  await history.saveDigest(digestWithSources);
+
+  const digests = await history.listDigests();
+  assert.deepEqual(digests[0]?.sources, digestWithSources.sources);
+});
