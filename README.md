@@ -12,6 +12,7 @@ This version also keeps a local history of digests, creates an experiment accoun
 - Deduplicates items using a local state file
 - Uses OpenAI or Groq to produce a structured digest
 - Saves each digest to `data/history`
+- Saves the rendered human-readable digest text to `data/outputs`
 - Creates and updates an experiment follow-up ledger in `data/experiment-log.json`
 - Outputs to console or Telegram
 
@@ -72,9 +73,10 @@ pnpm run log-action -- --run 2026-04-10T15-30-00-000Z --exercise yes --post yes 
 
 - `data/state.json`: dedupe state
 - `data/history/*.json`: one file per completed digest run, including source collection and notification delivery status
+- `data/outputs/*.txt`: one rendered human-readable digest per run, timestamped in the file body
 - `data/experiment-log.json`: your accountability ledger
 
-A run is considered complete after summarization succeeds and the digest is written to history. Telegram is a notification channel only; if Telegram delivery fails, the digest is still saved and the failure is recorded in that history file.
+A run is considered complete after summarization succeeds, the digest is written to history, the experiment entry is created, and the rendered output file is saved. Telegram is a notification channel only; if Telegram delivery fails, the digest is still saved and the failure is recorded in that history file.
 
 If every source collector fails, the run fails before summarization and no history or dedupe state is written. If only some sources fail, the run continues with the successful sources and records the failed source details in history.
 
@@ -107,6 +109,12 @@ Run every morning at 7:30:
 ```cron
 30 7 * * * cd /path/to/ai-tech-radar && /usr/bin/node --env-file-if-exists=.env --import tsx src/index.ts >> ./radar.log 2>&1
 ```
+
+## Agent planning
+
+Agent work should start from `AGENTS.md` and the docs under `docs/`. Planner-only prompts must not implement changes.
+
+For the current minimal task, use `.tasks/001-output-logging.md` and distinguish existing digest history persistence from any new output persistence.
 
 ## Guardrails
 

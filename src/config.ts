@@ -20,6 +20,7 @@ const EnvSchema = z.object({
   STATE_FILE: z.string().default('./data/state.json'),
   DIGEST_HISTORY_DIR: z.string().default('./data/history'),
   EXPERIMENT_LOG_FILE: z.string().default('./data/experiment-log.json'),
+  OUTPUT_LOG_DIR: z.string().default('./data/outputs'),
   OUTPUT_MODE: z.enum(['console', 'telegram']).default('console')
 });
 
