@@ -1,5 +1,6 @@
 import { getStorageConfig } from '../config.js';
 import { HistoryStore } from '../history/store.js';
+import { parseRating } from './log-action-options.js';
 
 function parseArgs(argv: string[]): Record<string, string> {
   const parsed: Record<string, string> = {};
@@ -47,7 +48,7 @@ async function main(): Promise<void> {
     didExercise: parseBool(args.exercise),
     wrotePost: parseBool(args.post),
     integratedIntoWorkflow: parseBool(args.workflow),
-    resultRating: args.rating ? Number(args.rating) as 1 | 2 | 3 | 4 | 5 : undefined,
+    resultRating: parseRating(args.rating),
     notes: args.notes ?? undefined,
     completedAt: new Date().toISOString()
   });
