@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "name": "AI Tech Radar",
+  "status": "in-progress",
+  "reviewed": true,
+  "roadmap": {
+    "outcome": "Demonstrate that the local radar can consistently turn selected AI and software-engineering signals into one completed, recorded workflow experiment, then tune its sources and cadence from those results.",
+    "currentStage": 3,
+    "stages": [
+      {
+        "id": "signal-collection-and-digest",
+        "title": "Signal collection and structured digest"
+      },
+      {
+        "id": "durable-accountability-loop",
+        "title": "Durable run and accountability loop"
+      },
+      {
+        "id": "operational-learning-validation",
+        "title": "Validate the learning loop in real use"
+      },
+      {
+        "id": "evidence-based-source-tuning",
+        "title": "Tune sources and cadence from outcomes"
+      }
+    ]
+  }
+}
